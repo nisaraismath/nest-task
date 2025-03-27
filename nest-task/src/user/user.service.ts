@@ -11,7 +11,7 @@ import * as bcrypt from 'bcrypt';
 export class UserService {
   constructor(
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    private userRepository: Repository<User>,
   ) {}
 
 
@@ -42,11 +42,11 @@ export class UserService {
     return await this.userRepository.findOne({ where: { email } });
   }
   
-  async findAllUsers(dto: FindUserDto) {
+  async findMany(dto: FindUserDto) {
     return this.userRepository.createQueryBuilder('user').getMany();
   }
 
-  async findUserById(
+  async findOne(
     id: string,
     selectSecrets:boolean = false,
   ): Promise<User | null> {
@@ -58,44 +58,45 @@ export class UserService {
         firstName: true,
         lastName: true,
         role: true,
+        status:true,
         password: selectSecrets,
       },
     });
   }
 
 
-  async updateUser(id: string, updateData: Partial<User>, currentUser: User): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { id } });
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-    if (currentUser.role === UserRole.User && currentUser.id !== id) {
-      throw new ForbiddenException('You can only update your own profile');
-    }
-    if (updateData.role && currentUser.role !== UserRole.Super_Admin) {
-      throw new ForbiddenException('Only Super Admin can change roles');
-    }
-    if (updateData.password) {
-      updateData.password = await bcrypt.hash(updateData.password, 10);
-    }
-    Object.assign(user, updateData);
-    await this.userRepository.save(user);
-    return user;
-  }
+  // async updateUser(id: string, updateData: Partial<User>, currentUser: User): Promise<User> {
+  //   const user = await this.userRepository.findOne({ where: { id } });
+  //   if (!user) {
+  //     throw new NotFoundException('User not found');
+  //   }
+  //   if (currentUser.role === UserRole.User && currentUser.id !== id) {
+  //     throw new ForbiddenException('You can only update your own profile');
+  //   }
+  //   if (updateData.role && currentUser.role !== UserRole.Super_Admin) {
+  //     throw new ForbiddenException('Only Super Admin can change roles');
+  //   }
+  //   if (updateData.password) {
+  //     updateData.password = await bcrypt.hash(updateData.password, 10);
+  //   }
+  //   Object.assign(user, updateData);
+  //   await this.userRepository.save(user);
+  //   return user;
+  // }
 
-  async deleteUser(id: string, currentUser: User): Promise<string> {
-    const user = await this.userRepository.findOne({ where: { id } });
+  // async deleteUser(id: string, currentUser: User): Promise<string> {
+  //   const user = await this.userRepository.findOne({ where: { id } });
 
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-    if (currentUser.role === UserRole.User) {
-      throw new ForbiddenException('You are not allowed to delete users');
-    }
-    if (user.role === UserRole.Admin && currentUser.role !== UserRole.Super_Admin) {
-      throw new ForbiddenException('Only Super Admin can delete Admins');
-    }
-    await this.userRepository.delete(id);
-    return 'User deleted successfully';
-  }
+  //   if (!user) {
+  //     throw new NotFoundException('User not found');
+  //   }
+  //   if (currentUser.role === UserRole.User) {
+  //     throw new ForbiddenException('You are not allowed to delete users');
+  //   }
+  //   if (user.role === UserRole.Admin && currentUser.role !== UserRole.Super_Admin) {
+  //     throw new ForbiddenException('Only Super Admin can delete Admins');
+  //   }
+  //   await this.userRepository.delete(id);
+  //   return 'User deleted successfully';
+  // }
 }

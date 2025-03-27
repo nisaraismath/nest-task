@@ -9,7 +9,7 @@ import { User } from '../user/entities/user.entity';
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     private configService: ConfigService,
-    private usersService: UserService,
+    private userService: UserService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -19,7 +19,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any){
-    const user = await this.usersService.findUserById(payload.id);
+    const user = await this.userService.findOne(payload.id);
     if (!user) {
       throw new UnauthorizedException();
     }

@@ -19,12 +19,12 @@ export class UserController {
 
 
   @Get()
-  getAllUsers(@Query() query: FindUserDto) {
-    return this.userService.findAllUsers(query);
+  findMany(@Query() query: FindUserDto) {
+    return this.userService.findMany(query);
   }
 
-  @Get(':id')
-  getUserById(@CurrentUser() user: User) {
+  @Get('profile')
+  getProfile(@CurrentUser() user: User) {
     return user;
   }
 
